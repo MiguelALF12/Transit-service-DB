@@ -1,0 +1,279 @@
+CREATE DATABASE SERVICIO_TRANSITO_DB;
+
+USE SERVICIO_TRANSITO_DB;
+
+#Creating DEPARTAMENTOS table
+CREATE TABLE DEPARTAMENTOS(
+    PK_id_departamento INTEGER NOT NULL,
+    nombre char(50) NOT NULL,
+    PRIMARY KEY (PK_id_departamento)
+);
+
+#Creating CIUDADES table
+
+CREATE TABLE CIUDADES(
+    PK_id_ciudad INTEGER NOT NULL,
+    nombre char(20) NOT NULL,
+    PRIMARY KEY (PK_id_ciudad),
+    FK_id_departamento integer NOT NULL,
+    KEY FK_id_departamento (FK_id_departamento),
+    CONSTRAINT FK_id_departamento FOREIGN KEY (FK_id_departamento) REFERENCES DEPARTAMENTOS(PK_id_departamento) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+#Creating MARCAS table
+CREATE TABLE MARCAS(
+    PK_id_marca INTEGER NOT NULL,
+    nombre char(20) NOT NULL,
+    PRIMARY KEY (PK_id_marca),
+    cantidad_modelos integer NOT NULL
+);
+
+#Creating CASA_AUTOMOTRIZ table
+CREATE TABLE CASAS_AUTOMOTRIZ(
+    PK_id_casa_automotriz INTEGER NOT NULL,
+    cantidad_marcas INTEGER NOT NULL,
+    cantidad_vehiculos INTEGER NOT NULL,
+    calle char(20) NOT NULL,
+    PRIMARY KEY (PK_id_casa_automotriz),
+    FK_id_ciudad integer NOT NULL,
+    FK_id_marca integer NOT NULL,
+    KEY FK_id_ciudad (FK_id_ciudad),
+    CONSTRAINT FK_id_ciudad FOREIGN KEY (FK_id_ciudad) REFERENCES CIUDADES(PK_id_ciudad) ON UPDATE CASCADE ON DELETE CASCADE,
+    KEY FK_id_marca (FK_id_marca),
+    CONSTRAINT FK_id_marca FOREIGN KEY (FK_id_marca) REFERENCES MARCAS(PK_id_marca) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+#Creating MODELOS table
+CREATE TABLE MODELOS(
+    PK_id_modelo INTEGER NOT NULL,
+    nombre CHAR(30) NOT NULL,
+    potencia INTEGER NOT NULL,
+    descripcion char(60) NOT NULL,
+    PRIMARY KEY (PK_id_modelo),
+    FK_id_marca integer NOT NULL,
+    KEY FK_id_marca (FK_id_marca),
+    CONSTRAINT FK_id_marca FOREIGN KEY (FK_id_marca) REFERENCES MARCAS(PK_id_marca) ON UPDATE CASCADE ON DELETE CASCADA
+);
+
+CREATE TABLE AGENTES(
+    PK_id_agente INTEGER NOT NULL,
+    nombre CHAR(30) NOT NULL,
+    apellido CHAR(30) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    calle INTEGER NOT NULL,
+    PRIMARY KEY (PK_id_agente),
+    FK_id_ciudad_agentes integer NOT NULL,
+    KEY FK_id_ciudad_agentes (FK_id_ciudad_agentes),
+    CONSTRAINT FK_id_ciudad_agentes FOREIGN KEY (FK_id_ciudad_agentes) REFERENCES CIUDADES(PK_id_ciudad) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+#Creating TELEFONO_AGENTES table
+CREATE TABLE TELEFONO_AGENTES(
+    PK_id_telefono_agente INTEGER NOT NULL,
+    telefono INTEGER NOT NULL,
+    PRIMARY KEY (PK_id_telefono_agente),
+    FK_id_agente integer NOT NULL,
+    KEY FK_id_agente (FK_id_agente),
+    CONSTRAINT FK_id_agente FOREIGN KEY (FK_id_agente) REFERENCES PERSONAS(PK_id_agente) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+CREATE TABLE PERSONAS(
+    PK_id_persona INTEGER NOT NULL,
+    NIT INTEGER NOT NULL UNIQUE,
+    nombre CHAR(30) NOT NULL,
+    apellido CHAR(30) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    calle INTEGER NOT NULL,
+    PRIMARY KEY (PK_id_persona),
+    FK_id_ciudad_personas integer NOT NULL,
+    KEY FK_id_ciudad_personas (FK_id_ciudad_personas),
+    CONSTRAINT FK_id_ciudad_personas FOREIGN KEY (FK_id_ciudad_personas) REFERENCES CIUDADES(PK_id_ciudad) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+#Creating TELEFONO_PERSONAS table
+CREATE TABLE TELEFONO_PERSONAS(
+    PK_id_telefono_persona INTEGER NOT NULL,
+    telefono INTEGER NOT NULL,
+    PRIMARY KEY (PK_id_telefono_persona),
+    FK_id_persona integer NOT NULL,
+    KEY FK_id_persona (FK_id_persona),
+    CONSTRAINT FK_id_persona FOREIGN KEY (FK_id_persona) REFERENCES PERSONAS(PK_id_persona) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+#Creating TIPOS_VEHICULOS table
+CREATE TABLE TIPOS_VEHICULOS(
+    PK_id_tipo_vehiculo INTEGER NOT NULL,
+    tipo char(20) NOT NULL,
+    tamano INTEGER NOT NULL,
+    PRIMARY KEY (PK_id_tipo_vehiculo)
+);
+
+#Creating VEHICULOS table
+CREATE TABLE VEHICULOS(
+    PK_id_vehiculo INTEGER NOT NULL,
+    matricula CHAR(100) NOT NULL,
+    fecha_matriculacion DATE NOT NULL,
+    PRIMARY KEY (PK_id_vehiculo),
+    FK_id_modelo_vehiculo integer NOT NULL,
+    FK_id_tipo integer NOT NULL,
+    FK_id_persona_vehiculo integer NOT NULL,
+    KEY FK_id_modelo_vehiculo (FK_id_modelo_vehiculo),
+    KEY FK_id_tipo (FK_id_tipo),
+    KEY FK_id_persona_vehiculo (FK_id_persona_vehiculo),
+    CONSTRAINT FK_id_modelo_vehiculo FOREIGN KEY (FK_id_modelo_vehiculo) REFERENCES MODELOS(PK_id_modelo) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT FK_id_tipo FOREIGN KEY (FK_id_tipo) REFERENCES TIPOS_VEHICULOS(PK_id_tipo_vehiculo) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT FK_id_persona_vehiculo FOREIGN KEY (FK_id_persona_vehiculo) REFERENCES PERSONAS(PK_id_persona) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+#Creating MULTAS table
+CREATE TABLE MULTAS(
+    PK_id_multa INTEGER NOT NULL,
+    descripcion CHAR(100) NOT NULL,
+    importe INTEGER NOT NULL,
+    fecha DATE NOT NULL,
+    hora char(8) NOT NULL,
+    calle INTEGER NOT NULL,
+    carretera INTEGER NOT NULL,
+    kilometro INTEGER NOT NULL,
+    articulo_infringido INTEGER NOT NULL,
+    PRIMARY KEY (PK_id_multa),
+    FK_id_agente_multa INTEGER NOT NULL,
+    FK_id_persona_multa INTEGER NOT NULL,
+    FK_id_vehiculo_multa INTEGER NOT NULL,
+    FK_id_ciudad_multa INTEGER NOT NULL,
+    KEY FK_id_agente_multa (FK_id_agente_multa),
+    KEY FK_id_persona_multa (FK_id_persona_multa),
+    KEY FK_id_vehiculo_multa (FK_id_vehiculo_multa),
+    KEY FK_id_ciudad_multa (FK_id_ciudad_multa),
+    CONSTRAINT FK_id_agente_multa FOREIGN KEY (FK_id_agente_multa) REFERENCES AGENTES(PK_id_agente) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT FK_id_persona_multa FOREIGN KEY (FK_id_persona_multa) REFERENCES PERSONAS(PK_id_persona) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT FK_id_vehiculo_multa FOREIGN KEY (FK_id_vehiculo_multa) REFERENCES VEHICULOS(PK_id_vehiculo) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT FK_id_ciudad_multa FOREIGN KEY (FK_id_ciudad_multa) REFERENCES CIUDADES(PK_id_ciudad) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+#---------------- MODEL FINAL FIXES ----------------
+USE SERVICIO_TRANSITO_DB;
+
+#Removing cantidad_marcas from CASAS_AUTOMOTRIZ and adding a foreign key to VEHICULOS referencing PK_id_casa_automotriz
+ALTER TABLE CASAS_AUTOMOTRIZ DROP cantidad_marcas;
+ALTER TABLE VEHICULOS ADD COLUMN FK_id_casa_automotriz INTEGER NOT NULL;
+ALTER TABLE VEHICULOS ADD KEY FK_id_casa_automotriz(FK_id_casa_automotriz);
+ALTER TABLE VEHICULOS ADD FOREIGN KEY (FK_id_casa_automotriz) REFERENCES CASAS_AUTOMOTRIZ(PK_id_casa_automotriz) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE TELEFONO_AGENTE MODIFY COLUMN telefono CHAR(20) NOT NULL;
+ALTER TABLE TELEFONO_PERSONAS MODIFY COLUMN telefono CHAR(20) NOT NULL;
+
+
+#---------------- RECORDS ----------------
+
+# inserting into DEPARTAMENTOS
+INSERT INTO DEPARTAMENTOS(PK_id_departamento,nombre) VALUES (1,"RISARALDA"),(2,"ANTIOQUIA"),(3,"CALDAS"),(4,"CUNDINAMARCA"),(5,"VALLE DEL CAUCA");
+
+# inserting into CIUDADES
+INSERT INTO CIUDADES(PK_id_ciudad,nombre,FK_id_departamento) VALUES (1,"PEREIRA",1),(2,"DOSQUEBRADAS",1),(3,"MEDELLIN",2),(4,"BELLO",2),(5,"MANIZALES",3),
+																	(6,"CHINCHINA",3),(7,"BOGOTA",4),(8,"GIRARDOT",4),(9,"CALI",5),(10,"BUGA",5);
+
+# inserting into MARCAS
+INSERT INTO MARCAS(PK_id_marca,nombre,cantidad_modelos) VALUES (1,"MAZDA",10),(2,"CHEVROLET",20),(3,"RENAULT",15),(4,"HYUNDAI",12),(5,"HONDA",10);
+
+# inserting into CASA_AUTOMOTRIZ
+INSERT INTO CASAS_AUTOMOTRIZ(PK_id_casa_automotriz, cantidad_vehiculos, calle, FK_id_ciudad, FK_id_marca) VALUES (1,7,23,1,1),(2,12,67,3,2),(3,10,18,5,3),(4,8,10,7,4),(5,4,80,9,5);
+
+# inserting into MODELOS
+#NOTE: There will be just 2 models for each brand even though we have said every registered brand has more than two models, just for the example.
+INSERT INTO MODELOS(PK_id_modelo,nombre,potencia,descripcion,FK_id_marca_modelo) VALUES (1,"MAZDA 2",100,"Un carro lujoso, veloz, eficaz",1),(2,"MAZDA 3",120,"Comodidad y eficiencia en tus manos",1),(3,"SAIL",110,"versatilidad al instante",2),(4,"IONIX",110,"Velocidad lo que quieras",2),(5,"STEPWAY",150,"Comparte con tu familia, comparte con STEPWAY",3),																			(6,"SANDERO",130,"Recorre el mundo con el poder de SANDERO",3),(7,"STAREX",200,"Velocidad que te estalla",4),(8,"KONA",180,"Lo bello de vivir es explorar nuevas cosas, hazlo con KONA",4),(9,"ACCORD",180,"De acuerdo con tu estilo de vida",5),(10,"S2000",210,"Amante a las carrerar y a lo extremo",5);
+
+# inserting into AGENTES
+INSERT INTO AGENTES(PK_id_agente,nombre,apellido,fecha_nacimiento,calle,FK_id_ciudad_agentes) VALUES (1,"Juan Jose","Carrillo Estrada","1989-04-01",19,1),(2,"Oscar Leandro", "Ramirez Vallesteros","1976-09-12",60,3),(3,"Ignacio Antonio", "Lopez Estrada","1972-02-03",42,7),(4,"Maria Estella","de la cruz Calle","1987-10-31",13,4),(5,"Gloria Mercedez", "Ramirez Castrillon","1990-12-24",57,9);
+
+# inserting into TELEFONO_AGENTES
+INSERT INTO TELEFONO_AGENTE(PK_id_telefono_agente,telefono,FK_id_agente) VALUES (1,"3217684567",1),(2,"3234576897",2),(3,"3102456327",3),(4,"3005463217",4),(5,"3214895231",5);
+
+# inserting into PERSONAS
+INSERT INTO PERSONAS(PK_id_persona,NIT,nombre,apellido,fecha_nacimiento,calle,FK_id_ciudad_personas) VALUES (1,1004718953,"Miguel Angel","Lopez Fernandez","2003-06-12",20,1),(2,42151649,"Lina Maria", "Fernandez","1986-03-12",98,2),(3,24928860,"Marina Lisbeth", "Fernandez","1956-04-18",32,2),(4,1004657345,"Jose Antonio","Guevara","1993-02-12",10,4),(5,10001249,"Gloria Maria", "Fernandez Restrepo","1987-09-10",64,5);
+
+# inserting into TELEFONO_PERSONAS
+INSERT INTO TELEFONO_PERSONAS(PK_id_telefono_persona,telefono,FK_id_persona) VALUES (1,"3218484132",1),(2,"3127940882",2),(3,"3207534579",3),(4,"3107654834",4),(5,"3206543908",5);
+
+# inserting into TIPO_VEHICULO
+INSERT INTO TIPOS_VEHICULOS(PK_id_tipo_vehiculo,tipo,tamano) VALUES (1,"Automovil",10),(2,"Camioneta", 20),(3,"Deportivo",12),(4,"Transporte pesado",40),(5,"Maquinaria",50);
+
+# inserting into VEHICULOS
+INSERT INTO VEHICULOS(PK_id_vehiculo, matricula, fecha_matriculacion,FK_id_modelo_vehiculo,FK_id_tipo,FK_id_persona_vehiculo,FK_id_casa_automotriz) VALUES
+(1,"HYU-567","2012-07-01",2,1,3,2),(2,"RBY-983","2010-12-20",1,1,1,1),(3,"NBU-325","2014-10-01",4,2,2,3),(4,"UYN-096","2015-02-15",7,1,4,5),(5,"AWS-210","2009-11-22",9,3,5,4);
+
+# inserting into MULTAS
+INSERT INTO MULTAS(PK_id_multa, descripcion, importe, fecha, hora, calle, carretera, kilometro, articulo_infringido, FK_id_agente_multa, FK_id_persona_multa, FK_id_vehiculo_multa, FK_id_ciudad_multa) VALUES (1,"iba muy rapido y se chocó",150000,"2022-01-11","13:05", 90, 7,6,63, 1, 1, 2, 1),(2,"estaba ebrio",290000,"2022-01-21","20:40",67,8,5,115, 1, 1, 2, 1),(3,"Se pasó un semaforo en rojo",100000,"2022-03-04","10:20", 10, 12,8,90, 2, 3, 1, 2),(4,"No tenía la tecnico mecánica al día",20000,"2022-04-11","00:50", 23, 1,6,1, 3, 2, 3, 2),(5,"Atropello a un nino",1200000,"2022-05-29","12:30", 56, 9,9,10, 3, 5, 5, 5);
+
+
+#---------------- 15 DIFFERENT QUERYS ----------------
+
+#Query #1
+INSERT INTO CASAS_AUTOMOTRIZ(PK_id_casa_automotriz, cantidad_vehiculos, calle, FK_id_ciudad, FK_id_marca) VALUES (6,8,56,(SELECT PK_id_ciudad FROM CIUDADES WHERE nombre = "MANIZALES"),(SELECT PK_id_marca FROM MARCAS WHERE nombre = "HONDA"));
+
+SELECT * FROM CASAS_AUTOMOTRIZ;
+SELECT PK_id_ciudad,nombre FROM CIUDADES WHERE nombre = "MANIZALES";
+SELECT PK_id_marca, nombre FROM MARCAS WHERE nombre = "HONDA";
+
+
+#Query #2
+UPDATE TELEFONO_PERSONAS SET telefono = '31078956' WHERE FK_id_persona = (SELECT PK_id_persona FROM PERSONAS WHERE nombre = "Miguel Angel");
+
+SELECT * FROM TELEFONO_PERSONAS
+SELECT PK_id_persona, nombre FROM PERSONAS WHERE nombre = "Miguel Angel";
+
+
+#Query #3
+UPDATE MULTAS SET importe = 100000 WHERE articulo_infringido = 90 OR 
+FK_id_vehiculo_multa IN 
+(SELECT PK_id_vehiculo FROM VEHICULOS WHERE 
+ FK_id_tipo = (SELECT PK_id_tipo_vehiculo FROM TIPOS_VEHICULOS where tipo = "Automovil"));
+
+SELECT PK_id_vehiculo FROM VEHICULOS WHERE 
+ FK_id_tipo = (SELECT PK_id_tipo_vehiculo FROM TIPOS_VEHICULOS where tipo = "Automovil");
+
+
+#Query #4
+DELETE FROM MULTAS WHERE descripcion = "No tenía la tecnico mecánica al día";
+SELECT * FROM MULTAS;
+
+#Query #5
+SELECT PERSONAS.PK_id_persona, PERSONAS.nombre, count(MULTAS.FK_id_persona_multa) AS total_multas FROM PERSONAS,MULTAS 
+WHERE PERSONAS.PK_id_persona = MULTAS.FK_id_persona_multa group by FK_id_persona_multa;
+
+#Query #6
+SELECT CIUDADES.PK_id_ciudad, CIUDADES.nombre FROM CIUDADES WHERE 
+CIUDADES.PK_id_ciudad = (SELECT CEILING(AVG(PERSONAS.FK_id_ciudad_personas)) FROM PERSONAS);
+
+#Query #7
+SELECT VEHICULOS.PK_id_vehiculo, VEHICULOS.matricula, MODELOS.nombre FROM VEHICULOS,MODELOS,MULTAS WHERE MULTAS.PK_id_vehiculo_multa=VEHICULO.PK_id_vehiculo AND VEHICULOS.FK_id_modelo_vehiculo = MODELOS.PK_id_modelo AND VEHICULOS.FK_id_tipo = (SELECT TIPOS_VEHICULOS.PK_id_tipo_vehiculo FROM TIPOS_VEHICULOS WHERE TIPOS_VEHICULOS.tipo = “Automovil”);
+
+#Query #8
+
+INSERT INTO VEHICULOS(PK_id_vehiculo, matricula, fecha_matriculacion,FK_id_modelo_vehiculo,FK_id_tipo,FK_id_persona_vehiculo,FK_id_casa_automotriz) VALUES
+(1,"HYU-567","2012-07-01",2,1,3,2);
+
+SELECT CA.PK_id_casa_automotriz, DEPA.nombre,CIU.nombre, COUNT(VEHI.FK_id_casa_automotriz) AS VENTAS_TOTALES FROM CASAS_AUTOMOTRIZ AS CA,DEPARTAMENTOS AS DEPA, CIUDADES AS CIU, VEHICULOS AS VEHI WHERE CA.FK_id_ciudad = CIU.PK_id_ciudad AND CIU.FK_id_departamento = DEPA.PK_id_departamento AND CA.PK_id_casa_automotriz = VEHI.FK_id_casa_automotriz GROUP BY (CA.PK_id_casa_automotriz);
+
+#Query 9
+SELECT PERSONAS.NIT, PERSONAS.nombre,PERSONAS.apellido, TELEFONO_PERSONAS.telefono, VEHICULOS.matricula, MODELOS.nombre FROM PERSONAS,TELEFONO_PERSONAS,VEHICULOS,MODELOS WHERE PERSONAS.PK_id_persona = TELEFONO_PERSONAS.FK_id_persona AND VEHICULOS.FK_id_persona_vehiculo = PERSONAS.PK_id_persona AND VEHICULOS.FK_id_modelo_vehiculo = MODELOS.PK_id_modelo;
+
+#Query 10
+
+SELECT PERSONAS.nombre, PERSONAS.apellido, MULTAS.articulo_infringido, AGENTES.nombre FROM MULTAS INNER JOIN PERSONAS ON MULTAS.FK_id_persona_multa = PERSONAS.PK_id_persona INNER JOIN AGENTES ON MULTAS.FK_id_agente_multa = AGENTES.PK_id_agente;
+
+#Query 11
+SELECT * FROM AGENTES WHERE nombre LIKE 'J%' or '%o';
+
+#Query 12
+SELECT PERSONAS.nombre, PERSONAS.apellido, VEHICULOS.matricula FROM PERSONAS,VEHICULOS WHERE PERSONAS.PK_id_persona = VEHICULOS.FK_id_persona_vehiculo ORDER BY PERSONAS.nombre;
+
+
+#Query 13
+SELECT PERSONAS.nombre, PERSONAS.apellido, VEHICULOS.matricula FROM PERSONAS,VEHICULOS where PERSONAS.PK_id_persona = VEHICULOS.FK_id_persona_vehiculo;
+
+#Query 14
+SELECT SUM(MULTAS.importe) AS deuda_total_multas, COUNT(*) as total_multas_realizadas FROM MULTAS; 
+
+#Query 15
+SELECT AGENTES.PK_id_agente,AGENTES.nombre, AGENTES.apellido, CIUDADES.nombre FROM AGENTES,CIUDADES WHERE AGENTES.FK_id_ciudad_agentes = CIUDADES.PK_id_ciudad AND AGENTES.FK_id_ciudad_agentes = (SELECT CIUDADES.PK_id_ciudad FROM CIUDADES WHERE CIUDADES.nombre = "PEREIRA") or AGENTES.FK_id_ciudad_agentes = (SELECT CIUDADES.PK_id_ciudad FROM CIUDADES WHERE CIUDADES.nombre = "DOSQUEBRADAS");
